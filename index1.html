@@ -1,0 +1,92 @@
+  <!DOCTYPE html>
+<html lang="en">
+<head>
+
+</head>
+<body>
+
+
+  <canvas width="700" height="700" style="background: red"></canvas>
+  <br>
+    <!--h1>Express 3.0 + Socket.IO</h1-->
+    <input id="button" type="button" value="Ping server"/>
+  <input id='boxX' type='text' size='20' />
+  <input id='boxY' type='text' size='20' />
+  <div id="drawing" style="background: black" width="478px" height="400px">div</div>
+  <hr>
+  
+<script src="/jquery.js"></script>
+<script src="/jcanvas.js"></script>
+<script src="/socket.io/socket.io.js"></script>
+<script>
+  var socket = io.connect('http://192.168.1.51:8080');
+
+
+  socket.on("pong",function(data){
+  	$("#msgbox").append(data.txt+"<br>");
+  });
+  
+  $("#button").click(function(){
+    	$("#msgbox").append("Ping server<br>");
+    	socket.emit("ping",{txt:"this is a message from client" });
+  });
+
+  	var X;
+  	var Y;
+
+    var bX = document.getElementById('boxX');
+	var bY = document.getElementById('boxY');
+    socket.on('relayX', function(data) {
+        bX.setAttribute('value', data.msg);
+   		//console.log(data.msg);
+   		X=data.msg;
+          $("canvas")
+            .clearCanvas()
+            .drawEllipse({
+              strokeStyle: "#36c",
+              strokeWidth: 4,
+              x: X, y: Y,
+              width: 30, height: 30
+            });
+
+    });
+
+    socket.on('relayY', function(data) {
+        bY.setAttribute('value', data.msg);
+   		//console.log(data.msg);
+   		Y=parseInt(data.msg,10);
+    //console.log('yyyyy'+Y);
+    });
+    //console.log('yyyyy'+Y);
+
+
+    document.onmousemove = function(event) {
+        event = event || window.event;
+        socket.emit('m', {x: event.clientX, y: event.clientY});
+    }
+
+
+
+    /*var context;
+    var canvas;
+    /*    window.onload = function(){
+        canvas = document.getElementById("myCanvas");
+        context = canvas.getContext("2d");
+    };
+
+        // do stuff here
+        context.moveTo(100, 150);
+		context.lineTo(350, 50);
+		context.lineWidth = 10;
+		context.strokeStyle = 'orange';
+		context.stroke();*/
+
+
+</script>
+
+
+	<!--canvas id="myCanvas" style="background: black" width="578" height="200">
+Your browser doesnot support Canvas Element. So, demo cannot be displayed.
+</canvas-->
+</body>
+</html>
