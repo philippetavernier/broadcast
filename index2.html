@@ -1,0 +1,73 @@
+  <!DOCTYPE html>
+<html lang="en">
+<head>
+
+</head>
+<body>
+
+
+  <canvas width="700" height="700" style="background: red"></canvas>
+  <br>
+    <!--h1>Express 3.0 + Socket.IO</h1-->
+    <input id="button" type="button" value="Ping server"/>
+  <input id='boxX' type='text' size='20' />
+  <input id='boxY' type='text' size='20' />
+  <div id="drawing" style="background: black" width="478px" height="400px">div</div>
+  <hr>
+  
+<script src="/jquery.js"></script>
+<script src="/jcanvas.js"></script>
+<script src="/socket.io/socket.io.js"></script>
+<script>
+  var socket = io.connect('http://192.168.1.51:8080');
+
+
+  socket.on("pong",function(data){
+  	$("#msgbox").append(data.txt+"<br>");
+  });
+  
+  $("#button").click(function(){
+    	$("#msgbox").append("Ping server<br>");
+    	socket.emit("ping",{txt:"this is a message from client" });
+  });
+
+  	var X;
+  	var Y;
+
+  var bX = document.getElementById('boxX');
+	var bY = document.getElementById('boxY');
+
+    socket.on('relay', function(data) {
+        bX.setAttribute('value', data.x);
+        bY.setAttribute('value', data.y);
+
+      X=data.x;
+   		Y=parseInt(data.y,10);
+              $("canvas")
+            .clearCanvas()
+            .drawEllipse({
+              strokeStyle: "#36c",
+              strokeWidth: 4,
+              x: X, y: Y,
+              width: 30, height: 30
+            });
+
+
+    //------------------
+    });
+
+
+
+    document.onmousemove = function(event) {
+        event = event || window.event;
+        socket.emit('m', {x:event.clientX, y:event.clientY});
+    }
+
+
+
+
+
+
+</script>
+</body>
+</html>
